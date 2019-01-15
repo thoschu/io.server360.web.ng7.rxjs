@@ -1,6 +1,13 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
 
-import {BehaviorSubject, Observable, Observer, ReplaySubject, Subject, Subscription} from 'rxjs';
+import {
+  interval,
+  BehaviorSubject,
+  Observable, Observer,
+  ReplaySubject,
+  Subject, Subscription
+} from 'rxjs';
+import {map, filter, mergeMap, switchMap, take} from 'rxjs/operators';
 
 @Component({
   selector: 'psx-root',
@@ -78,6 +85,20 @@ export class AppComponent implements OnInit, OnDestroy {
     this._rsubject$.next(9);
     this._rsubject$.subscribe(value => console.log('_rsubject$.subscribe   3', value));
     this._rsubject$.next(10);
+
+    const observable$ = interval(1000);
+    const subscription = observable$.subscribe(x => console.log(x));
+    // Later:
+    // This cancels the ongoing Observable execution which
+    // was started by calling subscribe with an Observer.
+    subscription.unsubscribe();
+
+    const intervalCount$ = interval(1000);
+    const takeFive$ = intervalCount$.pipe(take(13));
+    const mapped$ = takeFive$.pipe(map(x => x * 100));
+    const filtered$ = mapped$.pipe(filter(x => x > 200 && x < 800));
+    const subscr$ = filtered$.subscribe(x => console.log(x));
+    // subscr$.unsubscribe();
   }
 
   ngOnDestroy(): void {
